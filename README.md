@@ -1,7 +1,7 @@
-# NNlib
+# MLlib
 
 ## Organization
-This library is used to construct different NN architectures using pytorch that could be applied to solve classification, tagger and seq2seq problems. The core package is lain on the ``chatanet`` folder, which consists of 06 sub-folders
+This library is used to construct different NN architectures using pytorch that could be applied to solve classification, tagger and seq2seq problems. The core package is lain on the ``mlmodels`` folder, which consists of 06 sub-folders
 
 ### ``utils`` folder
 This folder contains scripts to:
