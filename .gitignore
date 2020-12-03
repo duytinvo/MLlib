@@ -1,0 +1,38 @@
+# find . -name .DS_Store -print0 | xargs -0 git rm --ignore-unmatch
+# find . -name __pycache__ -print0 | xargs -0 git rm -r --ignore-unmatch
+# git rm -r --cached .
+# remove large files
+# git filter-branch -f --index-filter 'git rm --cached --ignore-unmatch csv_data/mysemQL/train.json' HEAD
+# git filter-branch --tree-filter 'rm -rf path/to/your/file' HEAD  --> git push
+*.DS_Store/
+
+*__pycache__/
+
+.idea/
+*-info/
+data/
+None/
+runs/
+MLlib.egg-info/
+*pycache*
+# *tar.gz*
+\#*#
+*~
+#*#
+/#*/#
+\#*\#
+*.csv
+*.pkl
+*.json
+*.pickle
+*tar.*
+*.pth
+*.DS_Store*
+
+mlmodels/metrics/summeval/data/
+mlmodels/metrics/summeval/embeddings/
+mlmodels/metrics/summeval/models/
+mlmodels/metrics/summeval/ROUGE-1.5.5/
+mlmodels/metrics/summeval/stanford-corenlp-full-2018-10-05/
+mlmodels/metrics/summeval/meteor-1.5.jar
+
