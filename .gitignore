@@ -29,6 +29,8 @@ MLlib.egg-info/
 *.pth
 *.DS_Store*
 
+venv/
+
 mlmodels/metrics/summeval/data/
 mlmodels/metrics/summeval/embeddings/
 mlmodels/metrics/summeval/models/
