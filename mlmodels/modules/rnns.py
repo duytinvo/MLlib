@@ -93,7 +93,7 @@ class RNN_layer(nn.Module):
         if input_lengths is not None:
             total_length = emb_inputs.size(1)
             # pack_input = pack_padded_sequence(emb_inputs, input_lengths.cpu().numpy(), True)
-            pack_input = pack_padded_sequence(emb_inputs, input_lengths, True)
+            pack_input = pack_padded_sequence(emb_inputs, input_lengths.cpu(), True)
             self.hidden_layer.flatten_parameters()
             rnn_out, hc_n = self.hidden_layer(pack_input, init_hidden)
             rnn_out, _ = pad_packed_sequence(rnn_out, batch_first=True, total_length=total_length)

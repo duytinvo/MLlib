@@ -138,28 +138,28 @@ if __name__ == '__main__':
 
     argparser.add_argument("--use_cuda", action='store_true', default=False, help="GPUs Flag (default False)")
 
-    argparser.add_argument('--model_args', help='Args file', default="labeler.args",
+    argparser.add_argument('--model_args', help='Args file', default="classifier.args",
                            type=str)
 
     argparser.add_argument('--model_dir', help='Model directory',
-                           default="../../data/reviews/trained_model/", type=str)
+                           default="/media/data/vnreviews/Product/dataset/trained_model/", type=str)
 
     argparser.add_argument('--vocab_file', help='file to save a pre-trained tokenizer', type=str,
                            default="/media/data/review_response/tokens/bert_level-bpe-vocab.txt")
     argparser.add_argument('--label_file', help='Trained file (semQL) in Json format', type=str,
-                           default="../../data/reviews/processed_csv/labels.txt")
+                           default="/media/data/vnreviews/Product/dataset/labels.txt")
 
     argparser.add_argument('--wombat_path', help='wombat directory', type=str,
                            default="/media/data/embeddings/database/glove-sqlite_")
 
     args = argparser.parse_args()
 
-    nl = "hiii justin was an excellent example of what good service is ."
-    nl2 = "very hip atmosphere , great food , friendly staff . kind of expensive but worth it ."
+    nl = "hạt nhỏ, bay mùi hơi lạ."
+    nl2 = "tuyệt vời ngoài sức tưởng tượng, chúc shop buôn may bán đắt"
     nls = [nl, nl2]
-    model_api = TAGGER(model_args=args.model_args, model_dir=args.model_dir,
-                       vocab_file=args.vocab_file, label_file=args.label_file,
-                       use_cuda=args.use_cuda, wombat_path=args.wombat_path)
+    model_api = CLASSIFIER(model_args=args.model_args, model_dir=args.model_dir,
+                           vocab_file=args.vocab_file, label_file=args.label_file,
+                           use_cuda=args.use_cuda, wombat_path=args.wombat_path)
     entries = model_api.batch_inference(nls)
 
     # model_api.regression_test(pfile="../../data/yelp_ner/test.csv", test_file="../../data/yelp_ner/processed/tag_bioes_test.csv",

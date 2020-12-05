@@ -35,12 +35,12 @@ if __name__ == '__main__':
 
     # Use for loading models
     argparser.add_argument('--model_dir', help='Trained model directory', type=str,
-                           default="../data/reviews/trained_model/2020_04_21_10_24/")
+                           default="/media/data/vnreviews/Product/dataset/trained_model/")
 
     argparser.add_argument('--vocab_file', help='file to save a pre-trained tokenizer', type=str,
                            default=settings.vocab_file)
     argparser.add_argument('--label_file', help='File saved all labels', type=str,
-                           default="../data/reviews/processed_csv/labels.txt")
+                           default="/media/data/vnreviews/Product/dataset/labels.txt")
 
     argparser.add_argument('--model_args', help='Args file', default=settings.model_args, type=str)
 
@@ -62,8 +62,8 @@ if __name__ == '__main__':
     model_api = load_model(args)
 
     # Single inference
-    nl = "hiii justin was an excellent example of what good customer service is ."
-    nl2 = "very hip atmosphere , great food , friendly staff . kind of expensive but worth it ."
+    nl = "hạt nhỏ, bay mùi hơi lạ."
+    nl2 = "tuyệt vời ngoài sức tưởng tượng, chúc shop buôn may bán đắt"
     nls = [nl, nl2]
     entries = model_api.batch_inference(nls)
     # timeit.timeit('test()', number=100, setup="from __main__ import test")

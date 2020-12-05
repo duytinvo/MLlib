@@ -24,7 +24,7 @@ class TXT:
                 # Skip the header
                 next(f)
             for line in itertools.islice(f, self.limit):
-                nl, target = TXT.task_parser(line)
+                nl, target = TXT.task_parser(line, task=self.task)
                 # assert len(nl) == len(target)
                 if self.source2idx is not None:
                     nl = self.source2idx(nl)
@@ -44,13 +44,14 @@ class TXT:
     def task_parser(line, task=2):
         tokens = line.split()
         if len(tokens) == 1:
+            pass
             nl = TXT.process_nl(tokens[0])
             target = None
         else:
             if task == 1:
-                nl, target = " ".join(tokens[0: -1]), tokens[-1]
-            elif task == 2:
                 target, nl = tokens[0], " ".join(tokens[1:])
+            elif task == 2:
+                nl, target = " ".join(tokens[0: -1]), tokens[-1]
             else:
                 raise Exception("not implement %s yet")
             nl = TXT.process_nl(nl)

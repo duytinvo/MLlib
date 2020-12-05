@@ -135,7 +135,7 @@ class Classifier_model(object):
             nl_len_tensor = Data2tensor.idx2tensor(nl_lens, dtype=torch.long, device=self.device)
             # wombat_tensor = [batch, nl_len, emb_dim]
             wombat_tensor = torch.zeros(nl_tensor.shape + (self.args.swd_dim,), dtype=torch.float32, device=self.device)
-            wombat_idx = (nl_tensor == self.unk_id).nonzero()
+            wombat_idx = torch.nonzero(nl_tensor == self.unk_id)
             if wombat_object is not None:
                 for t, (i, j) in enumerate(wombat_idx.tolist()):
                     word_to_lookup = wd_tokens[i][j]
@@ -526,13 +526,13 @@ def main(argv):
     argparser.add_argument('--vocab_file', help='file to save a pre-trained tokenizer', type=str,
                            default="/media/data/review_response/tokens/bert_level-bpe-vocab.txt")
     argparser.add_argument('--label_file', help='Trained file (semQL) in Json format', type=str,
-                           default="/media/data/classification/datasets/yelp_review_full_csv/labels.txt")
+                           default="/media/data/vnreviews/Product/dataset/labels.txt")
     argparser.add_argument('--train_file', help='Trained file (semQL) in Json format', type=str,
-                           default="/media/data/classification/datasets/yelp_review_full_csv/dev.s.csv")
+                           default="/media/data/vnreviews/Product/dataset/dev.txt")
     argparser.add_argument('--dev_file', help='Validated file (semQL) in Json format', type=str,
-                           default="/media/data/classification/datasets/yelp_review_full_csv/dev.s.csv")
+                           default="/media/data/vnreviews/Product/dataset/dev.txt")
     argparser.add_argument('--test_file', help='Tested file (semQL) in Json format', type=str,
-                           default="/media/data/classification/datasets/yelp_review_full_csv/test.csv")
+                           default="/media/data/vnreviews/Product/dataset/test.txt")
     argparser.add_argument("--firstline", action='store_true', default=False,
                            help="labelled files having a header")
 
@@ -541,7 +541,7 @@ def main(argv):
                            help="Save models in timestamped subdirectory")
     argparser.add_argument("--log_file", type=str, default="logging.txt", help="log_file")
     argparser.add_argument('--model_dir', help='Model directory',
-                           default="./data/reviews/trained_model/", type=str)
+                           default="/media/data/vnreviews/Product/dataset/trained_model/", type=str)
     argparser.add_argument('--model_args', help='Trained argument filename', default="classifier.args", type=str)
     argparser.add_argument('--classifier_file', help='Trained classifier_file filename',
                            default="classifier.m", type=str)
@@ -591,7 +591,7 @@ def main(argv):
     argparser.add_argument("--final_dropout", type=float, default=0.5, help="Dropout rate at the last layer")
 
     # Optimizer parameters
-    argparser.add_argument("--max_epochs", type=int, default=256, help="Maximum trained epochs")
+    argparser.add_argument("--max_epochs", type=int, default=8, help="Maximum trained epochs")
     argparser.add_argument("--batch_size", type=int, default=16, help="Mini-batch size")
     argparser.add_argument("--patience", type=int, default=32,
                            help="Early stopping if no improvement after patience epoches")

@@ -26,13 +26,12 @@ def save_label(train_files, label_file, task=2, firstline=True):
 if __name__ == "__main__":
     from mlmodels.utils.special_tokens import SENSP, SENGE
     parser = argparse.ArgumentParser()
-
     # Required parameters
     parser.add_argument("--train_file", type=str,
-                        default="/media/data/classification/datasets/yelp_review_full_csv/train.csv",
+                        default="/media/data/vnreviews/Product/dataset/train.txt",
                         help="The input training data file")
     parser.add_argument("--label_file", type=str,
-                        default="/media/data/classification/datasets/yelp_review_full_csv/labels.txt",
+                        default="/media/data/vnreviews/Product/dataset/labels.txt",
                         help="The output label file")
     args = parser.parse_args()
     save_label([args.train_file], args.label_file, task=1, firstline=False)

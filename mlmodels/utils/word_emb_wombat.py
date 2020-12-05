@@ -1,7 +1,7 @@
 from wombat_api.core import connector as wb_conn
 
 StrFeedbackErrorCode = '*PAD*'
-Wombat_wec_ids = "algo:glove;dataset:42b;dims:300;fold:1;unit:token;norm:none"
+Wombat_wec_ids = "algo:glove;dataset:6b;dims:300;fold:1;unit:token;norm:none"
 
 
 class Wombat(object):
@@ -33,6 +33,6 @@ class Wombat(object):
 
 
 if __name__ == '__main__':
-    wombat_path = "/Users/media/data/embeddings/database/glove-sqlite_"
+    wombat_path = "/media/data/embeddings/wombat_data/"
     wombat_object = Wombat(wombat_path)
     pass

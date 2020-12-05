@@ -7,7 +7,12 @@ import torch
 from torch.nn.utils.rnn import pad_sequence
 from collections import Counter
 from random import choices
-from sql_py_antlr.Utilities import Utilities
+try:
+    from sql_py_antlr.Utilities import Utilities
+except:
+    pass
+
+from mlmodels.utils.txtIO import TXT
 from mlmodels.utils.csvIO import CSV
 from mlmodels.utils.jsonIO import JSON
 from mlmodels.utils.special_tokens import PAD, SOT, EOT, UNK, COL, TAB, NULL, NL2LC
@@ -41,6 +46,8 @@ class Tokenizer(object):
                 datasets.append(CSV(fname, limit=-1, firstline=firstline, task=task))
             elif fname.split(".")[-1] == "json":
                 datasets.append(JSON(fname, limit=-1, task=task))
+            elif fname.split(".")[-1] == "txt":
+                datasets.append(TXT(fname, limit=-1, firstline=firstline, task=task))
             else:
                 raise Exception("Not implement yet")
         return datasets
@@ -71,10 +78,13 @@ class Tokenizer(object):
         # load datasets to map into indexes
         if filename.split(".")[-1] == "csv":
             data_iter = CSV.get_iterator(filename, firstline=firstline, task=task)
-            num_lines = CSV._len(filename)
+            num_lines = CSV._len(filename, firstline=firstline)
         elif filename.split(".")[-1] == "json":
             data_iter = JSON.get_iterator(filename, task=task)
             num_lines = JSON._len(filename)
+        elif filename.split(".")[-1] == "txt":
+            data_iter = TXT.get_iterator(filename, firstline=firstline, task=task)
+            num_lines = TXT._len(filename, firstline=firstline)
         else:
             raise Exception("Not implement yet")
         return data_iter, num_lines

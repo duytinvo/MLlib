@@ -4,13 +4,13 @@ Created on 2019-06-27
 @author: duytinvo
 """
 
-data_folder = "/media/data/classification/datasets/yelp_review_full_csv/"
+data_folder = "/media/data/vnreviews/Product/dataset/"
 # input peripherals
 vocab_file = "/media/data/review_response/tokens/bert_level-bpe-vocab.txt"
 label_file = data_folder + "labels.txt"
-train_file = data_folder + "dev.s.csv"
-dev_file = data_folder + "dev.s.csv"
-test_file = data_folder + "test.csv"
+train_file = data_folder + "dev.txt"
+dev_file = data_folder + "dev.txt"
+test_file = data_folder + "test.txt"
 pred_test_file = data_folder + "regression/test.csv"
 firstline = False
 
@@ -26,6 +26,7 @@ labeler_file = "classifier.m"
 tlargs = ""
 
 # vocab & embedding parameters
+tokenize_type = "splitter"
 wl_th = -1
 wcutoff = 1
 ssos = False
@@ -61,7 +62,7 @@ final_dropout = 0.5
 # se_transitions = False
 
 # Optimizer parameters
-max_epochs = 128
+max_epochs = 4
 batch_size = 32
 patience = 64
 
@@ -75,6 +76,5 @@ metric = "f1"
 use_cuda = False
 
 # use pre-trained emb for inference
-wombat_path = "/media/data/embeddings/database/glove-sqlite_"
-# wombat_path = "/Users/media/data/embeddings/database/glove-sqlite_"
+wombat_path = "/media/data/embeddings/wombat_data/"
 
