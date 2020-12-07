@@ -28,10 +28,10 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     # Required parameters
     parser.add_argument("--train_file", type=str,
-                        default="/media/data/vnreviews/Product/dataset/train.txt",
+                        default="/media/data/vnreviews/combined_set/train.csv",
                         help="The input training data file")
     parser.add_argument("--label_file", type=str,
-                        default="/media/data/vnreviews/Product/dataset/labels.txt",
+                        default="/media/data/vnreviews/combined_set/labels.txt",
                         help="The output label file")
     args = parser.parse_args()
-    save_label([args.train_file], args.label_file, task=1, firstline=False)
+    save_label([args.train_file], args.label_file, task=1, firstline=True)
