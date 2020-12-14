@@ -34,4 +34,4 @@ if __name__ == "__main__":
                         default="/media/data/vnreviews/combined_set/labels.txt",
                         help="The output label file")
     args = parser.parse_args()
-    save_label([args.train_file], args.label_file, task=1, firstline=True)
+    save_label([args.train_file], args.label_file, task=2, firstline=True)

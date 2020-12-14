@@ -16,6 +16,13 @@ class APRF1:
         acc = metrics.accuracy_score(y_true, y_pred)
         precision, recall, f1, _ = metrics.precision_recall_fscore_support(y_true, y_pred, average='weighted')
         return precision, recall, f1, acc
+
+    @staticmethod
+    def sklearn_bin(y_true, y_pred):
+        acc = metrics.accuracy_score(y_true, y_pred)
+        precision, recall, f1, _ = metrics.precision_recall_fscore_support(y_true, y_pred, average=None,
+                                                                           labels=['0', '1'])
+        return precision, recall, f1, acc
     @staticmethod
     def accuracies(reference, candidate):
         flatten = lambda l: [item for sublist in l for item in sublist]

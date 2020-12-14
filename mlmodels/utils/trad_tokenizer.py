@@ -43,7 +43,7 @@ class Tokenizer(object):
         for fname in files:
             # Read input files
             if fname.split(".")[-1] == "csv":
-                datasets.append(CSV(fname, limit=-1, firstline=firstline, task=task))
+                datasets.append(CSV(fname, limit=-1, firstline=firstline, task=task, delimiter='\t'))
             elif fname.split(".")[-1] == "json":
                 datasets.append(JSON(fname, limit=-1, task=task))
             elif fname.split(".")[-1] == "txt":
@@ -77,8 +77,8 @@ class Tokenizer(object):
     def prepare_iter(filename, firstline=True, task=2):
         # load datasets to map into indexes
         if filename.split(".")[-1] == "csv":
-            data_iter = CSV.get_iterator(filename, firstline=firstline, task=task)
-            num_lines = CSV._len(filename, firstline=firstline)
+            data_iter = CSV.get_iterator(filename, firstline=firstline, task=task, delimiter='\t')
+            num_lines = CSV._len(filename, firstline=firstline, delimiter='\t')
         elif filename.split(".")[-1] == "json":
             data_iter = JSON.get_iterator(filename, task=task)
             num_lines = JSON._len(filename)

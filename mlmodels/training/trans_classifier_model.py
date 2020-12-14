@@ -24,6 +24,7 @@ from tqdm import tqdm, trange
 from transformers import (
     AutoConfig,
     AutoModelForSequenceClassification,
+    MT5ForConditionalGeneration,
     AutoTokenizer,
     WEIGHTS_NAME,
     AdamW,
@@ -205,13 +206,13 @@ class TransClassifierModel(object):
         self.num_labels = len(self.tokenizer.tw2i)
 
         if self.args.block_size <= 0:
-            self.args.block_size = self.tokenizer.max_len
+            self.args.block_size = self.tokenizer.model_max_length
             # Our input block size will be the max possible for the model
         else:
-            self.args.block_size = min(self.args.block_size, self.tokenizer.max_len)
+            self.args.block_size = min(self.args.block_size, self.tokenizer.model_max_length)
 
         data_block_size = self.args.block_size - (
-                self.tokenizer.max_len - self.tokenizer.max_len_single_sentence)
+                self.tokenizer.model_max_length - self.tokenizer.max_len_single_sentence)
         logger.info("Training/evaluation parameters %s", self.args)
 
         self.source2idx = TransClassifierModel.tok2id(self.tokenizer, data_block_size,
@@ -238,12 +239,14 @@ class TransClassifierModel(object):
             id2label=self.tokenizer.i2tw,
             label2id=self.tokenizer.tw2i,
             cache_dir=self.args.cache_dir)
-
-        self.model = AutoModelForSequenceClassification.from_pretrained(
-                                        model_name_or_path,
-                                        from_tf=bool(".ckpt" in self.args.model_name_or_path),
-                                        config=self.config,
-                                        cache_dir=self.args.cache_dir)
+        if self.args.model_type == "mt5":
+            self.model = MT5ForConditionalGeneration.from_pretrained(model_name_or_path)
+        else:
+            self.model = AutoModelForSequenceClassification.from_pretrained(
+                                            model_name_or_path,
+                                            from_tf=bool(".ckpt" in self.args.model_name_or_path),
+                                            config=self.config,
+                                            cache_dir=self.args.cache_dir)
 
         self.model.to(self.args.device)
 
@@ -265,9 +268,12 @@ class TransClassifierModel(object):
             nl = batch[0]
             nl_mask = (nl != self.pad_id).to(dtype=nl.dtype)
             segment_id = (nl == self.pad_id).to(dtype=nl.dtype)
-            labels = batch[1].squeeze(-1)
+            if self.args.model_type in ["mt5"]:
+                labels = batch[1]
+            else:
+                labels = batch[1].squeeze(-1)
             inputs = {"input_ids": nl, "attention_mask": nl_mask, "labels": labels}
-            if self.args.model_type != "distilbert":
+            if self.args.model_type not in ["distilbert", "mt5"]:
                 inputs["token_type_ids"] = (segment_id if self.args.model_type in ["bert", "xlnet"] else None)
                 # XLM and RoBERTa don"t use segment_ids
 
@@ -609,9 +615,12 @@ class TransClassifierModel(object):
                 nl = batch[0]
                 nl_mask = (nl != self.pad_id).to(dtype=nl.dtype)
                 segment_id = (nl == self.pad_id).to(dtype=nl.dtype)
-                labels = batch[1].squeeze()
+                if self.args.model_type in ["mt5"]:
+                    labels = batch[1]
+                else:
+                    labels = batch[1].squeeze(-1)
                 inputs = {"input_ids": nl, "attention_mask": nl_mask, "labels": labels}
-                if self.args.model_type != "distilbert":
+                if self.args.model_type not in ["distilbert", "mt5"]:
                     inputs["token_type_ids"] = (
                         segment_id if self.args.model_type in ["bert", "xlnet"] else None
                     )  # XLM and RoBERTa don"t use segment_ids
@@ -624,8 +633,8 @@ class TransClassifierModel(object):
                 eval_loss += tmp_eval_loss.item()
             nb_eval_steps += 1
 
-            preds = logits.argmax(dim=-1).detach().cpu().tolist()
-            out_label_ids = inputs["labels"].detach().cpu().tolist()
+            preds = logits.argmax(dim=-1).squeeze(-1).detach().cpu().tolist()
+            out_label_ids = inputs["labels"].squeeze(-1).detach().cpu().tolist()
             nl_list = inputs["input_ids"].detach().cpu().tolist()
             if isinstance(out_label_ids, int):
                 out_label_ids = [out_label_ids]
@@ -727,7 +736,7 @@ class TransClassifierModel(object):
                 nl_mask = (nl != self.pad_id).to(dtype=nl.dtype)
                 segment_id = (nl == self.pad_id).to(dtype=nl.dtype)
                 inputs = {"input_ids": nl, "attention_mask": nl_mask}
-                if self.args.model_type != "distilbert":
+                if self.args.model_type not in ["distilbert", "mt5"]:
                     inputs["token_type_ids"] = (
                         segment_id if self.args.model_type in ["bert", "xlnet"] else None
                     )  # XLM and RoBERTa don"t use segment_ids
@@ -757,18 +766,18 @@ class TransClassifierModel(object):
         return list(zip(toks_list, preds_list, probs_list))
 
 
-def main(argv):
+def main(argv=''):
     now = time.time()
     parser = argparse.ArgumentParser(argv)
     # input peripherals
     parser.add_argument('--label_file', help='Trained file (semQL) in Json format', type=str,
-                           default="/media/data/review_response/labels.txt")
-    parser.add_argument("--train_file", default="/media/data/review_response/Dev.json", type=str,
+                           default="/media/data/vnreviews/combined_set/labels.txt")
+    parser.add_argument("--train_file", default="/media/data/vnreviews/combined_set/dev.csv", type=str,
                         help="The input training data file (a text file)."
                         )
-    parser.add_argument("--dev_file", default="/media/data/review_response/Test.json", type=str,
+    parser.add_argument("--dev_file", default="/media/data/vnreviews/combined_set/dev.csv", type=str,
                         help="An optional input evaluation data file to evaluate the perplexity on (a text file).", )
-    parser.add_argument("--test_file", default="/media/data/review_response/Test.json", type=str,
+    parser.add_argument("--test_file", default="/media/data/vnreviews/combined_set/test.csv", type=str,
                         help="An optional input test data file to test the perplexity on (a text file).", )
     parser.add_argument("--firstline", action='store_true', default=False,
                            help="labelled files having a header")
@@ -776,7 +785,7 @@ def main(argv):
                         help="if the label is the first column")
 
     # output peripherals
-    parser.add_argument("--output_dir", default="./data/reviews/trained_model", type=str,
+    parser.add_argument("--output_dir", default="/media/data/vnreviews/combined_set/trained_model/", type=str,
                         # required=True,
                         help="The output directory where the model predictions and checkpoints will be written.",)
     parser.add_argument("--overwrite_output_dir", action="store_true",
@@ -879,15 +888,10 @@ def main(argv):
 
 if __name__ == "__main__":
     """
-    python -m mlmodels.demo.trans_classifier_train \
-    --label_file /media/data/review_response/toy_datasets/csv/labels.txt \
-    --train_file /media/data/review_response/toy_datasets/csv/dev.csv \
-    --dev_file /media/data/review_response/toy_datasets/csv/dev.csv \
-    --test_file /media/data/review_response/toy_datasets/csv/test.csv \
-    --output_dir /media/data/review_response/toy_datasets/csv/trained_model/ \
-    --model_type bert --model_name_or_path bert-base-uncased \
-    --num_train_epochs 5 --per_gpu_train_batch_size 8 \
-    --seed 12345 --do_train --overwrite_output_dir \
-    --evaluate_during_training --metric f1 --save_total_limit 3    
+    python -m mlmodels.training.trans_classifier_model --train_file /media/data/vincss/data_v4/train_1211-1012.csv \
+    --dev_file /media/data/vincss/data_v4/dev_1211-1012.csv --test_file /media/data/vincss/data_v4/dev_1211-1012.csv \
+    --label_file /media/data/vincss/data_v4/labels.txt --firstline --output_dir /media/data/vincss/data_v4/trained_model/ \
+    --overwrite_output_dir --do_train --evaluate_during_training --num_train_epochs 128 --per_gpu_train_batch_size 32 \
+    --per_gpu_eval_batch_size 32 --patience 8 --use_fast --model_type mt5 --model_name_or_path google/mt5-small   
     """
     results = main(sys.argv)

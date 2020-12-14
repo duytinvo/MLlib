@@ -12,7 +12,7 @@ import six
 
 
 class CSV(object):
-    def __init__(self, filename, source2idx=None, target2idx=None, firstline=True, limit=-1, task=2):
+    def __init__(self, filename, source2idx=None, target2idx=None, firstline=True, limit=-1, task=2, delimiter='\t'):
         self.filename = filename
         self.source2idx = source2idx
         self.target2idx = target2idx
@@ -20,11 +20,12 @@ class CSV(object):
         self.firstline = firstline
         self.limit = limit if limit > 0 else None
         self.task = task
+        self.delimiter = delimiter
 
     def __iter__(self):
         with open(self.filename, newline='', encoding='utf-8') as f:
             f.seek(0)
-            csvreader = CSV.unicode_csv_reader(f)
+            csvreader = CSV.unicode_csv_reader(f, delimiter=self.delimiter)
             # csvreader = csv.reader(f)
             if self.firstline:
                 # Skip the header
@@ -50,9 +51,9 @@ class CSV(object):
     def task_parser(line, task=2):
         score = None
         if task == 1:
-            target, nl = line[0], line[-1]
+            target, nl = line[-2], line[-1]
         elif task == 2:
-            nl, target = line[0], line[-1]
+            nl, target = line[-2], line[-1]
         elif task == 3:
             nl, score, target = line[0], line[1], line[-1]
         else:
@@ -98,11 +99,11 @@ class CSV(object):
         return data
 
     @staticmethod
-    def get_map(data_path, firstline=True, task=2):
+    def get_map(data_path, firstline=True, task=2, delimiter=','):
         data = []
         with open(data_path, 'r', encoding='utf8') as f:
             f.seek(0)
-            csvreader = csv.reader(f)
+            csvreader = csv.reader(f, delimiter=delimiter)
             if firstline:
                 # Skip the header
                 next(csvreader)
@@ -111,7 +112,7 @@ class CSV(object):
         return data
 
     @staticmethod
-    def get_iterator(data_path, firstline=True, task=2):
+    def get_iterator(data_path, firstline=True, task=2, delimiter=','):
         r"""
         Generate an iterator to read CSV file.
         yield texts line-by-line.
@@ -124,7 +125,7 @@ class CSV(object):
 
         def iterator(start, num_lines):
             with io.open(data_path, encoding="utf8") as f:
-                reader = CSV.unicode_csv_reader(f)
+                reader = CSV.unicode_csv_reader(f, delimiter=delimiter)
                 if firstline and start == 0:
                     next(reader)
                 for i, row in enumerate(reader):
@@ -144,11 +145,11 @@ class CSV(object):
         return iterator
 
     @staticmethod
-    def _len(_file, firstline=True):
+    def _len(_file, firstline=True, delimiter=','):
         count = 0
         with open(_file, 'r', encoding='utf8') as f:
             f.seek(0)
-            csvreader = csv.reader(f)
+            csvreader = csv.reader(f, delimiter=delimiter)
             if firstline:
                 # Skip the header
                 next(csvreader)
