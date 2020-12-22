@@ -199,7 +199,7 @@ class TransClassifierModel(object):
         self.tokenizer.add_tokens([SENSP, SENGE, NULL, NL])
 
         labels_list = TXT.read(self.args.label_file, firstline=False)
-        self.tokenizer.tw2i = Tokenizer.list2dict(sys_tokens + labels_list)
+        self.tokenizer.tw2i = Tokenizer.list2dict(labels_list)
         self.tokenizer.i2tw = Tokenizer.reversed_dict(self.tokenizer.tw2i)
 
         self.pad_id = 0 if self.tokenizer._pad_token is None else self.tokenizer.pad_token_id
@@ -788,7 +788,6 @@ def main(argv=''):
 
     # output peripherals
     parser.add_argument("--output_dir", default="/media/data/vnreviews/combined_set/trained_model/", type=str,
-                        # required=True,
                         help="The output directory where the model predictions and checkpoints will be written.",)
     parser.add_argument("--overwrite_output_dir", action="store_true",
                         help="Overwrite the content of the output directory")
