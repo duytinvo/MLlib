@@ -308,8 +308,8 @@ class TransClassifierModel(object):
                     if self.args.local_rank == -1 and self.args.evaluate_during_training:
                         # Only evaluate when single GPU otherwise metrics may not average well
                         results, _, _ = self.evaluate_batch(self.args.dev_file)
-                        for key, value in results.items():
-                            self.tb_writer.add_scalar("eval_{}".format(key), value, global_step)
+                        # for key, value in results.items():
+                        #     self.tb_writer.add_scalar("eval_{}".format(key), value, global_step)
 
                     self.tb_writer.add_scalar("lr", self.scheduler.get_lr()[0], global_step)
                     self.tb_writer.add_scalar("loss", (tr_loss - logging_loss) / self.args.save_steps, global_step)
@@ -474,8 +474,8 @@ class TransClassifierModel(object):
                 if self.args.local_rank == -1 and self.args.evaluate_during_training:
                     results, _, _ = self.evaluate_batch(self.args.dev_file,
                                                         prefix="of dev_set used the epoch_{} model".format(ep_count))
-                    for key, value in results.items():
-                        self.tb_writer.add_scalar("eval_{}".format(key), value, global_step)
+                    # for key, value in results.items():
+                    #     self.tb_writer.add_scalar("eval_{}".format(key), value, global_step)
 
                     dev_metric = results["loss"] if self.args.metric == "loss" else results["f1"]
                     cond = dev_metric < best_dev if self.args.metric == "loss" else dev_metric > best_dev
