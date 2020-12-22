@@ -64,11 +64,11 @@ class MLcls:
         vec_para = {
                     'vectorizer__strip_accents': ['ascii', 'unicode', None],
                     # 'vectorizer__lowercase': (True, False),
-                    # 'vectorizer__ngram_range': list(zip([1] * 3, list(range(1, 4)))),
-                    'vectorizer__ngram_range': [(1, 3)],  # onlu use tri-gram
+                    'vectorizer__ngram_range': list(zip([1] * 3, list(range(1, 4)))),
+                    # 'vectorizer__ngram_range': [(1, 3)],  # onlu use tri-gram
                     'vectorizer__analyzer': ['char', 'word', 'char_wb'],
-                    # 'vectorizer__min_df': [0.0001, 0.001, 0.01, 0.1],
-                    # 'vectorizer__max_df': [0.9999, 0.999, 0.99, 0.9],
+                    'vectorizer__min_df': [0.0001, 0.001, 0.01, 0.1],
+                    'vectorizer__max_df': [0.9999, 0.999, 0.99, 0.9],
                     'vectorizer__binary': (True, False)
                     }
         self.parameters.update(vec_para)
@@ -254,7 +254,7 @@ if __name__ == '__main__':
     
     argparser.add_argument("--scaler", action='store_true', default=False, help="scale flag")
     
-    argparser.add_argument('--ml_type', help='Machine learning algorithms', default="NB", type=str)
+    argparser.add_argument('--ml_type', help='Machine learning algorithms', default="SVM", type=str)
 
     args = argparser.parse_args()
     
@@ -265,7 +265,7 @@ if __name__ == '__main__':
     args.model_name = os.path.join(args.model_dir, args.ml_type + ".pickle")
 
     trad_ml = MLcls(args=args)
-    # trad_ml.train()
+    trad_ml.train()
 
     # measures = test(args, args.model_name)
     # label, prob = predict("call us to win a price", args.model_name)

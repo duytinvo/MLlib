@@ -12,17 +12,24 @@ sys_tokens = [PAD, SOT, EOT, UNK]
 
 class APRF1:
     @staticmethod
-    def sklearn(y_true, y_pred):
+    def sklearn(y_true, y_pred, labels=['0', '1']):
         acc = metrics.accuracy_score(y_true, y_pred)
         precision, recall, f1, _ = metrics.precision_recall_fscore_support(y_true, y_pred, average='weighted')
         return precision, recall, f1, acc
 
     @staticmethod
-    def sklearn_bin(y_true, y_pred):
+    def sklearn_bin(y_true, y_pred, labels=['0', '1']):
         acc = metrics.accuracy_score(y_true, y_pred)
-        precision, recall, f1, _ = metrics.precision_recall_fscore_support(y_true, y_pred, average=None,
-                                                                           labels=['0', '1'])
-        return precision, recall, f1, acc
+        metric_i = metrics.precision_recall_fscore_support(y_true, y_pred, average=None, labels=labels)
+        results = {"precision_i": metric_i[0],
+                   "recall_i": metric_i[1],
+                   "f1_i": metric_i[2]}
+        metric_a = metrics.precision_recall_fscore_support(y_true, y_pred, average='weighted')
+        results.update({"precision": metric_a[0],
+                        "recall": metric_a[1],
+                        "f1": metric_a[2]})
+        return results
+
     @staticmethod
     def accuracies(reference, candidate):
         flatten = lambda l: [item for sublist in l for item in sublist]

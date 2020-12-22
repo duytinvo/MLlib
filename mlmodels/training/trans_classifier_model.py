@@ -648,6 +648,7 @@ class TransClassifierModel(object):
 
         eval_loss = eval_loss / nb_eval_steps
         # print(candidate, reference)
+        results = {"loss": eval_loss}
         if len(candidate) != 0 and len(reference) != 0:
             assert len(candidate) == len(reference)
             # Randomly sample one pair
@@ -657,20 +658,21 @@ class TransClassifierModel(object):
             print("\t- A LABEL query: ", reference[rand_idx])
             print("\t- A PREDICTED query: ", candidate[rand_idx])
             # print("\t- A PREDICTED prob: ", predict_probs[rand_idx], "\n\n")
-            metrics = TransClassifierModel.class_metrics(reference, candidate)
+            metrics = TransClassifierModel.class_metrics(reference, candidate,
+                                                         labels=sorted(self.tokenizer.i2tw.keys()))
+            results.update(metrics)
         else:
-            metrics = [0., 0., 0.]
-
-        results = {"loss": eval_loss, "precision": metrics[0], "recall": metrics[1], "f1": metrics[2]}
+            results.update({"precision": 0., "recall": 0., "f1": 0.})
         logger.info("***** Eval results %s *****", prefix)
         for key in sorted(results.keys()):
             logger.info("  %s = %s", key, str(results[key]))
         return results, candidate, nl_tokens
 
     @staticmethod
-    def class_metrics(reference, candidate):
-        p, r, f1, acc = APRF1.sklearn(reference, candidate)
-        return p, r, f1
+    def class_metrics(reference, candidate, labels=['0', '1']):
+        results= APRF1.sklearn_bin(reference, candidate, labels=labels)
+
+        return results
 
     def evaluate(self, eval_output_file="eval_results.txt"):
         results = {}
